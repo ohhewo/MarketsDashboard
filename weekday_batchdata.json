@@ -1,0 +1,8 @@
+{
+    "nodes": [
+      {"id": "1", "batchName": "Batch A", "startTime": "08:00", "finishTime": "09:30", "slaTime": "10:00"},
+      {"id": "2", "batchName": "Batch B", "startTime": "10:00", "finishTime": "11:15", "slaTime": "11:30"},
+      {"id": "3", "batchName": "Batch C", "startTime": "12:00", "finishTime": "12:45", "slaTime": "13:00"}
+    ]
+  }
+  
