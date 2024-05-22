@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 import './styles.css';
 
-const width = 960;
-const height = 500;
+const width = window.innerWidth;
+const height = window.innerHeight;
 const margin = 20;
 const whiteBoxPadding = 20;
 const whiteBoxWidth = width - whiteBoxPadding * 2;
@@ -50,14 +50,20 @@ if (svgContainer.select("svg").empty()) {
         // Group nodes by lab
         const labs = d3.groups(nodes, d => d.lab);
 
+        // Calculate lab box dimensions dynamically based on the number of labs
+        const numCols = Math.ceil(Math.sqrt(labs.length));
+        const numRows = Math.ceil(labs.length / numCols);
+        const labBoxWidth = width / numCols;
+        const labBoxHeight = height / numRows;
+
         const labBoxes = g.selectAll(".lab-box")
             .data(labs)
             .enter().append("rect")
             .attr("class", "lab-box")
-            .attr("x", (d, i) => (i % 2) * (width / 2) + margin)
-            .attr("y", (d, i) => Math.floor(i / 2) * (height / 2) + margin)
-            .attr("width", width / 2 - 2 * margin)
-            .attr("height", height / 2 - 2 * margin)
+            .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
+            .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin)
+            .attr("width", labBoxWidth - 2 * margin)
+            .attr("height", labBoxHeight - 2 * margin)
             .attr("stroke", "black")
             .attr("stroke-dasharray", "4")
             .attr("fill", "none");
@@ -65,10 +71,10 @@ if (svgContainer.select("svg").empty()) {
         const labBoxCoords = {};
         labBoxes.each(function (d, i) {
             labBoxCoords[d[0]] = {
-                x: (i % 2) * (width / 2) + margin,
-                y: Math.floor(i / 2) * (height / 2) + margin,
-                width: width / 2 - 2 * margin,
-                height: height / 2 - 2 * margin
+                x: (i % numCols) * labBoxWidth + margin,
+                y: Math.floor(i / numCols) * labBoxHeight + margin,
+                width: labBoxWidth - 2 * margin,
+                height: labBoxHeight - 2 * margin
             };
         });
 
@@ -77,8 +83,8 @@ if (svgContainer.select("svg").empty()) {
             .data(labs)
             .enter().append("text")
             .attr("class", "lab-name")
-            .attr("x", (d, i) => (i % 2) * (width / 2) + margin)
-            .attr("y", (d, i) => Math.floor(i / 2) * (height / 2) + margin - 5)
+            .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
+            .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin - 5)
             .text(d => d[0])
             .style("font-weight", "bold")
             .style("font-size", "14px");
@@ -179,7 +185,7 @@ if (svgContainer.select("svg").empty()) {
 
         // Create custom cursor
         const customCursor = svg.append("circle")
-            .attr("r", 5)
+            .attr("r", 10)
             .attr("fill", "black")
             .attr("opacity", 0.5)
             .style("pointer-events", "none")
@@ -195,5 +201,94 @@ if (svgContainer.select("svg").empty()) {
         svg.on("mouseout", function() {
             customCursor.attr("visibility", "hidden");
         });
+
+        // Add filters functionality
+        d3.select("#labFilter").on("change", function() {
+            updateBorders();
+        });
+
+        d3.select("#featureFilter").on("change", function() {
+            updateBorders();
+        });
+
+        function updateBorders() {
+            const showLabBorders = d3.select("#labFilter").property("checked");
+            const showFeatureBorders = d3.select("#featureFilter").property("checked");
+
+            // Remove existing borders
+            g.selectAll(".lab-box, .feature-box").remove();
+
+            if (showLabBorders) {
+                // Draw lab borders
+                const labBoxes = g.selectAll(".lab-box")
+                    .data(labs)
+                    .enter().append("rect")
+                    .attr("class", "lab-box")
+                    .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
+                    .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin)
+                    .attr("width", labBoxWidth - 2 * margin)
+                    .attr("height", labBoxHeight - 2 * margin)
+                    .attr("stroke", "black")
+                    .attr("stroke-dasharray", "4")
+                    .attr("fill", "none");
+
+                labBoxes.each(function (d, i) {
+                    labBoxCoords[d[0]] = {
+                        x: (i % numCols) * labBoxWidth + margin,
+                        y: Math.floor(i / numCols) * labBoxHeight + margin,
+                        width: labBoxWidth - 2 * margin,
+                        height: labBoxHeight - 2 * margin
+                    };
+                });
+
+                // Add lab names
+                g.selectAll(".lab-name")
+                    .data(labs)
+                    .enter().append("text")
+                    .attr("class", "lab-name")
+                    .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
+                    .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin - 5)
+                    .text(d => d[0])
+                    .style("font-weight", "bold")
+                    .style("font-size", "14px");
+            }
+
+            if (showFeatureBorders) {
+                // Draw feature borders within each lab
+                labs.forEach((lab, i) => {
+                    const features = d3.groups(lab[1], d => d.feature);
+
+                    const featureBoxWidth = labBoxCoords[lab[0]].width / Math.ceil(Math.sqrt(features.length));
+                    const featureBoxHeight = labBoxCoords[lab[0]].height / Math.ceil(features.length / Math.ceil(Math.sqrt(features.length)));
+
+                    features.forEach((feature, j) => {
+                        const featureBoxX = labBoxCoords[lab[0]].x + (j % Math.ceil(Math.sqrt(features.length))) * featureBoxWidth;
+                        const featureBoxY = labBoxCoords[lab[0]].y + Math.floor(j / Math.ceil(Math.sqrt(features.length))) * featureBoxHeight;
+
+                        g.append("rect")
+                            .attr("class", "feature-box")
+                            .attr("x", featureBoxX)
+                            .attr("y", featureBoxY)
+                            .attr("width", featureBoxWidth - 2 * margin)
+                            .attr("height", featureBoxHeight - 2 * margin)
+                            .attr("stroke", "blue")
+                            .attr("stroke-dasharray", "4")
+                            .attr("fill", "none");
+
+                        g.append("text")
+                            .attr("class", "feature-name")
+                            .attr("x", featureBoxX + 5)
+                            .attr("y", featureBoxY + 15)
+                            .text(feature[0])
+                            .style("font-weight", "bold")
+                            .style("font-size", "12px");
+                    });
+                });
+            }
+        }
+
+        // Initial call to updateBorders to draw borders if filters are checked
+        updateBorders();
     });
 }
+

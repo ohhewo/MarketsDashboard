@@ -51,6 +51,7 @@ header nav ul li a:hover {
     width: 100vw;
     height: 100vh;
     position: relative;
+    cursor: none; /* Hide the default cursor */
 }
 
 .lab-box {

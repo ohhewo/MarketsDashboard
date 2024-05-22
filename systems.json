@@ -1,9 +1,9 @@
 {
     "nodes": [
-      {"id": "SUMMIT", "name": "Summit", "lab": "Lab 1", "footprint": 50},
-      {"id": "PRESTO", "name": "Presto", "lab": "Lab 2", "footprint": 30},
-      {"id": "MUREXMAS", "name": "MurexMAS", "lab": "Lab 3", "footprint": 20},
-      {"id": "PARIS", "name": "Paris", "lab": "Lab 4", "footprint": 40},
+      {"id": "SUMMIT", "name": "Summit", "lab": "Trading Systems", "footprint": 50},
+      {"id": "PRESTO", "name": "Presto", "lab": "Cloud", "footprint": 30},
+      {"id": "MUREXMAS", "name": "MurexMAS", "lab": "Trading Systems", "footprint": 20},
+      {"id": "PARIS", "name": "Paris", "lab": "Product and Data", "footprint": 40},
       {"id": "PRESTOKAFKA", "name": "PrestoKafka", "lab": "Lab 5", "footprint": 35},
       {"id": "SIMRA", "name": "Simra", "lab": "Lab 6", "footprint": 25},
       {"id": "SOD", "name": "Sod", "lab": "Lab 7", "footprint": 45},
