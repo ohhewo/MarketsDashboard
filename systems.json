@@ -1,0 +1,27 @@
+{
+    "nodes": [
+      {"id": "SUMMIT", "name": "Summit", "lab": "Lab 1", "footprint": 50},
+      {"id": "PRESTO", "name": "Presto", "lab": "Lab 2", "footprint": 30},
+      {"id": "MUREXMAS", "name": "MurexMAS", "lab": "Lab 3", "footprint": 20},
+      {"id": "PARIS", "name": "Paris", "lab": "Lab 4", "footprint": 40},
+      {"id": "PRESTOKAFKA", "name": "PrestoKafka", "lab": "Lab 5", "footprint": 35},
+      {"id": "SIMRA", "name": "Simra", "lab": "Lab 6", "footprint": 25},
+      {"id": "SOD", "name": "Sod", "lab": "Lab 7", "footprint": 45},
+      {"id": "MDPS", "name": "Mdps", "lab": "Lab 8", "footprint": 55},
+      {"id": "CRE", "name": "Cre", "lab": "Lab 9", "footprint": 60},
+      {"id": "MARKETSMANAGER", "name": "MarketsManager", "lab": "Lab 10", "footprint": 50}
+    ],
+    "links": [
+      {"source": "SUMMIT", "target": "PRESTO", "type": "downstream"},
+      {"source": "MUREXMAS", "target": "PRESTOKAFKA", "type": "downstream"},
+      {"source": "PARIS", "target": "PRESTO", "type": "upstream"},
+      {"source": "PRESTO", "target": "SUMMIT", "type": "downstream"},
+      {"source": "PRESTOKAFKA", "target": "PARIS", "type": "upstream"},
+      {"source": "SUMMIT", "target": "SIMRA", "type": "upstream"},
+      {"source": "SIMRA", "target": "SOD", "type": "upstream"},
+      {"source": "SOD", "target": "MDPS", "type": "upstream"},
+      {"source": "MDPS", "target": "CRE", "type": "upstream"},
+      {"source": "CRE", "target": "MARKETSMANAGER", "type": "upstream"}
+    ]
+  }
+  
