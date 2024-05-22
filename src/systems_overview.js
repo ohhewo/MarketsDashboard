@@ -10,16 +10,10 @@ const whiteBoxHeight = height - whiteBoxPadding * 2;
 
 // Colors for labs
 const labColors = {
-    "Lab 1": "#FFDDC1",
-    "Lab 2": "#C1FFD7",
-    "Lab 3": "#C1D4FF",
-    "Lab 4": "#FFD1C1",
-    "Lab 5": "#D4FFC1",
-    "Lab 6": "#FFC1C1",
-    "Lab 7": "#C1FFC1",
-    "Lab 8": "#C1C1FF",
-    "Lab 9": "#FFD1FF",
-    "Lab 10": "#D1FFC1"
+    "Trading Systems": "#FFDDC1",
+    "Cloud": "#C1FFD7",
+    "Product and Data": "#C1D4FF",
+    "Lab 6": "#FFD1C1",
 };
 
 const svgContainer = d3.select("#chart");
@@ -56,38 +50,15 @@ if (svgContainer.select("svg").empty()) {
         const labBoxWidth = width / numCols;
         const labBoxHeight = height / numRows;
 
-        const labBoxes = g.selectAll(".lab-box")
-            .data(labs)
-            .enter().append("rect")
-            .attr("class", "lab-box")
-            .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
-            .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin)
-            .attr("width", labBoxWidth - 2 * margin)
-            .attr("height", labBoxHeight - 2 * margin)
-            .attr("stroke", "black")
-            .attr("stroke-dasharray", "4")
-            .attr("fill", "none");
-
         const labBoxCoords = {};
-        labBoxes.each(function (d, i) {
-            labBoxCoords[d[0]] = {
+        labs.forEach((lab, i) => {
+            labBoxCoords[lab[0]] = {
                 x: (i % numCols) * labBoxWidth + margin,
                 y: Math.floor(i / numCols) * labBoxHeight + margin,
                 width: labBoxWidth - 2 * margin,
                 height: labBoxHeight - 2 * margin
             };
         });
-
-        // Add lab names
-        g.selectAll(".lab-name")
-            .data(labs)
-            .enter().append("text")
-            .attr("class", "lab-name")
-            .attr("x", (d, i) => (i % numCols) * labBoxWidth + margin)
-            .attr("y", (d, i) => Math.floor(i / numCols) * labBoxHeight + margin - 5)
-            .text(d => d[0])
-            .style("font-weight", "bold")
-            .style("font-size", "14px");
 
         // Filter out standalone systems with no links
         const linkedNodes = new Set(links.flatMap(l => [l.source, l.target]));
@@ -96,8 +67,8 @@ if (svgContainer.select("svg").empty()) {
         const simulation = d3.forceSimulation(filteredNodes)
             .force("link", d3.forceLink(links).id(d => d.id).distance(100))
             .force("charge", d3.forceManyBody().strength(-50))
-            .force("x", d3.forceX(d => labBoxCoords[d.lab]?.x + labBoxCoords[d.lab]?.width / 2 || whiteBoxWidth / 2))
-            .force("y", d3.forceY(d => labBoxCoords[d.lab]?.y + labBoxCoords[d.lab]?.height / 2 || whiteBoxHeight / 2))
+            .force("x", d3.forceX(width / 2))
+            .force("y", d3.forceY(height / 2))
             .force("collision", d3.forceCollide().radius(d => Math.sqrt(d.footprint) * 4 + margin)); // Increase size
 
         const link = g.append("g")
@@ -110,11 +81,14 @@ if (svgContainer.select("svg").empty()) {
 
         const node = g.append("g")
             .attr("class", "nodes")
-            .selectAll("circle")
+            .selectAll("rect")
             .data(filteredNodes)
-            .enter().append("circle")
-            .attr("r", d => Math.sqrt(d.footprint) * 4) // Increase size
+            .enter().append("rect")
+            .attr("width", d => Math.sqrt(d.footprint) * 4)
+            .attr("height", d => Math.sqrt(d.footprint) * 4)
             .attr("fill", "steelblue")
+            .attr("rx", 5)
+            .attr("ry", 5)
             .on("click", handleClick)
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -128,7 +102,7 @@ if (svgContainer.select("svg").empty()) {
             .enter().append("text")
             .attr("dx", 12)
             .attr("dy", ".35em")
-            .text(d => d.name);
+            .text(d => `${d.name} (${d.type})`);
 
         simulation
             .nodes(filteredNodes)
@@ -145,11 +119,11 @@ if (svgContainer.select("svg").empty()) {
                 .attr("y2", d => d.target.y);
 
             node
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
+                .attr("x", d => d.x - Math.sqrt(d.footprint) * 2)
+                .attr("y", d => d.y - Math.sqrt(d.footprint) * 2);
 
             labels
-                .attr("x", d => d.x)
+                .attr("x", d => d.x + Math.sqrt(d.footprint) * 2 + 5)
                 .attr("y", d => d.y);
         }
 
@@ -172,7 +146,7 @@ if (svgContainer.select("svg").empty()) {
 
         function handleClick(event, d) {
             const isActive = d3.select(this).classed("active");
-            d3.selectAll("circle").classed("active", false).attr("fill", "steelblue");
+            d3.selectAll("rect").classed("active", false).attr("fill", "steelblue");
             d3.selectAll("line").classed("highlight", false).attr("stroke-width", 2);
 
             if (!isActive) {
@@ -216,7 +190,7 @@ if (svgContainer.select("svg").empty()) {
             const showFeatureBorders = d3.select("#featureFilter").property("checked");
 
             // Remove existing borders
-            g.selectAll(".lab-box, .feature-box").remove();
+            g.selectAll(".lab-box, .feature-box, .lab-name, .feature-name").remove();
 
             if (showLabBorders) {
                 // Draw lab borders
@@ -285,10 +259,21 @@ if (svgContainer.select("svg").empty()) {
                     });
                 });
             }
+
+            if (showLabBorders || showFeatureBorders) {
+                // Constrain nodes to lab or feature boxes
+                simulation.force("x", d3.forceX(d => labBoxCoords[d.lab]?.x + labBoxCoords[d.lab]?.width / 2 || whiteBoxWidth / 2))
+                    .force("y", d3.forceY(d => labBoxCoords[d.lab]?.y + labBoxCoords[d.lab]?.height / 2 || whiteBoxHeight / 2));
+            } else {
+                // Spread nodes freely
+                simulation.force("x", d3.forceX(width / 2))
+                    .force("y", d3.forceY(height / 2));
+            }
+
+            simulation.alpha(0.3).restart();
         }
 
         // Initial call to updateBorders to draw borders if filters are checked
         updateBorders();
     });
 }
-
