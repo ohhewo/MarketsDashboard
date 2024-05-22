@@ -1,4 +1,6 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
@@ -15,15 +17,35 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
             },
         ],
     },
-    optimization: {
-        splitChunks: {
-            chunks: 'all',
-        },
-    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'styles.css',
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'src/index.html',
+            chunks: ['index']
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'systems_overview.html',
+            template: 'src/systems_overview.html',
+            chunks: ['systems_overview']
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'weekday_batch_sla_view.html',
+            template: 'src/weekday_batch_sla_view.html',
+            chunks: ['weekday_batch_sla_view']
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'weekend_batch_sla_view.html',
+            template: 'src/weekend_batch_sla_view.html',
+            chunks: ['weekend_batch_sla_view']
+        })
+    ],
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),

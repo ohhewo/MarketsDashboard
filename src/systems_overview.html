@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Systems Overview</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="systems_overview.html">Systems Overview</a></li>
+          <li>
+            <a href="weekday_batch_sla_view.html">Weekday Batch SLA View</a>
+          </li>
+          <li>
+            <a href="weekend_batch_sla_view.html">Weekend Batch SLA View</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div id="filters">
+      <label
+        ><input type="checkbox" id="labFilter" checked /> Show Lab
+        Borders</label
+      >
+      <label
+        ><input type="checkbox" id="featureFilter" checked /> Show Feature
+        Borders</label
+      >
+    </div>
+    <div id="chart"></div>
+    <script src="systems_overview.bundle.js"></script>
+  </body>
+</html>
