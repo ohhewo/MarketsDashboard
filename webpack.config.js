@@ -1,4 +1,6 @@
 const path = require('path');
+//add html-webpack-plugin
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -13,7 +15,7 @@ module.exports = {
     },
     module: {
         rules: [
-            {
+           {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
@@ -33,15 +35,40 @@ module.exports = {
             }
         ]
     },
+
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Dashboard',
+            filename: 'index.html',
+            template: './src/index.html',
+            chunks: ['index']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'Systems Overview',
+            filename: 'systems_overview.html',
+            template: './src/systems_overview.html',
+            chunks: ['systems_overview']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'Weekday Batch SLA View',
+            filename: 'weekday_batch_sla_view.html',
+            template: './src/weekday_batch_sla_view.html',
+            chunks: ['weekday_batch_sla_view']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'Weekend Batch SLA View',
+            filename: 'weekend_batch_sla_view.html',
+            template: './src/weekend_batch_sla_view.html',
+            chunks: ['weekend_batch_sla_view']
+        })
+    ],
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),
         },
         compress: true,
         port: 9000,
-        headers: {
-            'Content-Type': 'text/javascript',
-            'Content-Type': 'text/html'
-        }
-    }
-};
+        open : true
+    },
+    mode: 'development' // 'production'
+}
