@@ -21,17 +21,21 @@
         </ul>
       </nav>
     </header>
+
     <div id="filters">
-      <label
-        ><input type="checkbox" id="labFilter" checked /> Show Lab
-        Borders</label
-      >
-      <label
-        ><input type="checkbox" id="featureFilter" checked /> Show Feature
-        Borders</label
-      >
+      <label>
+        <input type="checkbox" id="labFilter" checked /> Show Lab Borders
+      </label>
+      <label>
+        <input type="checkbox" id="featureFilter" checked /> Show Feature
+        Borders
+      </label>
+      <button id="resetZoom">Reset Zoom</button>
     </div>
+
     <div id="chart"></div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="systems_overview.bundle.js"></script>
   </body>
 </html>

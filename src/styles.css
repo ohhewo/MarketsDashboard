@@ -127,3 +127,17 @@ header nav ul li a:hover {
     stroke-opacity: 0.7;
     shape-rendering: crispEdges;
 }
+
+#resetZoom {
+    margin-left: 20px;
+    padding: 5px 10px;
+    background-color: #007C43;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#resetZoom:hover {
+    background-color: #005C30;
+}

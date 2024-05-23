@@ -22,7 +22,7 @@ if (svgContainer.select("svg").empty()) {
     const svg = svgContainer.append("svg")
         .attr("width", width)
         .attr("height", height)
-        .call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", function(event) {
+        .call(d3.zoom().scaleExtent([0.5, 1]).on("zoom", function(event) {
             svg.attr("transform", event.transform);
         }))
         .append("g");
@@ -44,12 +44,11 @@ if (svgContainer.select("svg").empty()) {
         // Group nodes by lab
         const labs = d3.groups(nodes, d => d.lab);
 
-        // Calculate lab box dimensions dynamically based on the number of labs
+        // Calculate lab box dimensions dynamically based on thenumber of labs
         const numCols = Math.ceil(Math.sqrt(labs.length));
         const numRows = Math.ceil(labs.length / numCols);
         const labBoxWidth = width / numCols;
         const labBoxHeight = height / numRows;
-
         const labBoxCoords = {};
         labs.forEach((lab, i) => {
             labBoxCoords[lab[0]] = {
@@ -81,14 +80,13 @@ if (svgContainer.select("svg").empty()) {
 
         const node = g.append("g")
             .attr("class", "nodes")
-            .selectAll("rect")
+            .selectAll("circle")  // Change to circle
             .data(filteredNodes)
-            .enter().append("rect")
-            .attr("width", d => Math.sqrt(d.footprint) * 4)
-            .attr("height", d => Math.sqrt(d.footprint) * 4)
+            .enter().append("circle")  // Change to circle
+            .attr("r", d => Math.sqrt(d.footprint) * 2)  // Change to circle
             .attr("fill", "steelblue")
-            .attr("rx", 5)
-            .attr("ry", 5)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
             .on("click", handleClick)
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -119,8 +117,8 @@ if (svgContainer.select("svg").empty()) {
                 .attr("y2", d => d.target.y);
 
             node
-                .attr("x", d => d.x - Math.sqrt(d.footprint) * 2)
-                .attr("y", d => d.y - Math.sqrt(d.footprint) * 2);
+                .attr("cx", d => d.x)  // Change to circle
+                .attr("cy", d => d.y);  // Change to circle
 
             labels
                 .attr("x", d => d.x + Math.sqrt(d.footprint) * 2 + 5)
@@ -146,7 +144,7 @@ if (svgContainer.select("svg").empty()) {
 
         function handleClick(event, d) {
             const isActive = d3.select(this).classed("active");
-            d3.selectAll("rect").classed("active", false).attr("fill", "steelblue");
+            d3.selectAll("circle").classed("active", false).attr("fill", "steelblue");
             d3.selectAll("line").classed("highlight", false).attr("stroke-width", 2);
 
             if (!isActive) {

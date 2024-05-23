@@ -1,6 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
@@ -11,48 +9,39 @@ module.exports = {
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist')
     },
     module: {
         rules: [
             {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader'],
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
             },
-        ],
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                use: ['file-loader']
+            }
+        ]
     },
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: 'styles.css',
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'src/index.html',
-            chunks: ['index']
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'systems_overview.html',
-            template: 'src/systems_overview.html',
-            chunks: ['systems_overview']
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'weekday_batch_sla_view.html',
-            template: 'src/weekday_batch_sla_view.html',
-            chunks: ['weekday_batch_sla_view']
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'weekend_batch_sla_view.html',
-            template: 'src/weekend_batch_sla_view.html',
-            chunks: ['weekend_batch_sla_view']
-        })
-    ],
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),
         },
         compress: true,
         port: 9000,
-        open: true,
-    },
-    mode: 'development'
+        headers: {
+            'Content-Type': 'text/javascript',
+            'Content-Type': 'text/html'
+        }
+    }
 };
